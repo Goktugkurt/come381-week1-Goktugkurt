@@ -1,32 +1,31 @@
+[AI_LOG.md](https://github.com/user-attachments/files/34652440/AI_LOG.md)
 # Yapay Zekâ Kullanım Kaydı
 
 **Proje:** Otonom Stok Takibi ve Kredi Risk Kontrollü Perakende Veritabanı Mimarisi  
 **Ders:** COME 381  
 **Öğrenci:** Göktuğ Kurt — Yönetim Bilişim Sistemleri — 202502009061
 
-Bu projede **ChatGPT (OpenAI)** ve **Claude (Anthropic)** yapay zekâ araçlarından yararlanılmıştır. Yapay zekâ önerileri taslak oluşturma, kodu gözden geçirme ve açıklamaları iyileştirme amacıyla kullanılmış; proje senaryosu ve nihai tasarım tercihleri öğrenci tarafından belirlenmiştir.
+Bu projede **ChatGPT (OpenAI)** ve **Claude (Anthropic)** yapay zekâ araçlarından yararlanılmıştır. Araçlar; taslak oluşturma, kod ve ilişkilerin gözden geçirilmesi, sorgu mantığının açıklanması ve metinlerin düzenlenmesi amacıyla kullanılmıştır. Proje senaryosu, nihai tasarım tercihleri ve teslim edilecek içerik üzerindeki son karar öğrenciye aittir.
 
 ## Ödev 1 — ER diyagramı ve veritabanı şeması
 
-ChatGPT ve Claude; tablo/alan adlarının gözden geçirilmesi, varlıklar arasındaki ilişkilerin kontrol edilmesi, M:N ilişkilerin ara tablolarla modellenmesi ve Mermaid ER diyagramının düzenlenmesi aşamalarında yardımcı olarak kullanılmıştır.
+ChatGPT ve Claude; tablo ve alan adlarının gözden geçirilmesi, varlıklar arasındaki ilişkilerin kontrol edilmesi, çoktan-çoğa (M:N) ilişkilerin ara tablolarla modellenmesi ve Mermaid ER diyagramının düzenlenmesi aşamalarında yardımcı olarak kullanılmıştır.
 
-Nihai modelde `purchase_order_item`, sipariş–ürün M:N ilişkisini; `sale_item` ise satış–ürün M:N ilişkisini çözer. Satış anındaki `unit_price` ve `unit_cost` değerlerinin `sale_item` tablosunda saklanması kararı, ürün fiyatları sonradan değiştiğinde geçmiş satış kârının değişmemesi amacıyla verilmiştir. Kredi satışında müşteri bulunması gerekliliği `chk_sale_credit_customer` kuralıyla ifade edilmiştir.
+Nihai modelde `purchase_order_item`, sipariş–ürün M:N ilişkisini; `sale_item` ise satış–ürün M:N ilişkisini çözer. Satış anındaki `unit_price` ve `unit_cost` değerlerinin `sale_item` tablosunda saklanması, ürün fiyatları sonradan değiştiğinde geçmiş satış kârının değişmemesi amacıyla tercih edilmiştir. Kredi satışında müşteri bulunması gerekliliği `chk_sale_credit_customer` kuralıyla ifade edilmiştir.
 
 ## Ödev 2 — Constraint'ler, ihlal testleri ve ilişkisel cebir
 
-ChatGPT ve Claude; `constraints.sql` dosyasındaki iş kurallarının ve açıklama yorumlarının gözden geçirilmesi, `violations.sql` test düzeninin oluşturulması, `seed.sql` örnek verilerinin hazırlanması ve `algebra.md` / `algebra.sql` taslaklarının kontrol edilmesi aşamalarında kullanılmıştır.
+ChatGPT ve Claude; `constraints.sql` dosyasındaki iş kurallarının ve açıklama yorumlarının gözden geçirilmesi, `violations.sql` testlerinin düzenlenmesi, `seed.sql` örnek verilerinin hazırlanması ve `algebra.md` / `algebra.sql` taslaklarının kontrol edilmesi aşamalarında kullanılmıştır.
 
-Claude'dan alınan inceleme/sadeleştirme önerileri doğrultusunda Hafta 8 kapsamında ele alınacak tablolar arası otomasyon kuralları (örneğin satış sırasında stok güncelleme) bu ödevin kapsamından ayrı tutulmuştur. Önceki geliştirme aşamasında seed ve sorgular için SQLite üzerinde ön kontrol yapıldığı belirtilmiştir; bu kontrol PostgreSQL üzerinde çalıştırma ve doğrulama yerine geçmez. Teslimde esas alınan veritabanı PostgreSQL'dir.
+Birden fazla tabloyu ilgilendiren otomasyon kuralları (örneğin satış sırasında stok güncelleme veya kredi satışında geçerli risk değerlendirmesini kontrol etme) bu ödevde `CHECK` kısıtlarıyla uygulanmamıştır. Bu tür kuralların PostgreSQL'de tablo seviyesini aşan kontrol gerektirdiği ve ileride trigger gibi veritabanı mekanizmalarıyla ele alınabileceği not edilmiştir.
 
-### D6 — İlişkisel bölme (division) deneyi
+## D6 — İlişkisel bölme (division) deneyi
 
-Bu bölümdeki D6 istemi ve ChatGPT yanıtı, AI kullanım kaydını tamamlamak için bu çalışma sırasında oluşturulup kontrol edilmiştir. Claude ile yapılan önceki sadeleştirme çalışmasının tam konuşma dökümü saklanmadığından Claude için uydurma bir prompt veya yanıt eklenmemiştir.
-
-**1. D6 için kullanılan ChatGPT istemi**
+### 1. ChatGPT'ye verilen istem
 
 > COME 381 projemde `product`, `category`, `sale` ve `sale_item` tabloları bulunuyor. `product` tablosunda `product_id`, `category_id` ve `status`; `category` tablosunda `category_id` ve `category_name`; `sale` tablosunda `sale_id` ve `sold_at`; `sale_item` tablosunda `sale_id` ve `product_id` alanları var. İlişkisel bölme (division) mantığıyla, Bira kategorisindeki bütün aktif ürünleri içeren satış fişlerini bulan PostgreSQL sorgusunu yaz. Sorguyu iç içe iki `NOT EXISTS` kullanarak kur. Başka kategorideki ürünlerin veya `discontinued` durumundaki bira ürünlerinin sonucu yanlışlıkla sağlamasını önle. Sorgunun neden division işlemini karşıladığını ve nasıl çalıştığını açıkla.
 
-**2. ChatGPT'nin ürettiği SQL yanıtı**
+### 2. ChatGPT'nin ürettiği SQL yanıtı
 
 ```sql
 SELECT s.sale_id, s.sold_at
@@ -48,28 +47,28 @@ WHERE NOT EXISTS (
 ORDER BY s.sale_id;
 ```
 
-Bu sorgu, her satış fişi için Bira kategorisindeki aktif ürünleri tarar. İçteki `NOT EXISTS`, ilgili ürünün fişte bulunmadığını; dıştaki `NOT EXISTS` ise eksik aktif bira ürünü kalmadığını ifade eder. Böylece yalnızca hedef kümedeki bütün ürünleri içeren fişler döner.
+### 3. Sorgunun açıklaması ve seed verisiyle beklenen sonuç
 
-**3. Proje sorgusuyla karşılaştırma ve seed verisinden beklenen sonuç**
+Sorgu, her satış fişi için Bira kategorisindeki aktif ürünleri hedef küme olarak belirler. İçteki `NOT EXISTS`, hedef kümedeki bir ürünün ilgili satış fişinde bulunmadığını kontrol eder. Dıştaki `NOT EXISTS` ise böyle eksik bir ürün kalmadığını doğrular. Başka bir ifadeyle, satış fişinde hedef kümedeki **bütün** aktif Bira ürünleri bulunmalıdır. Bu, ilişkisel bölme (division) işleminin mantığıdır.
 
-Üretilen sorgu, `week-05/algebra.sql` dosyasındaki D6 sorgusuyla aynı çift `NOT EXISTS` mantığını kullanır. `week-05/seed.sql` içindeki aktif Bira ürünleri `product_id` 1, 2 ve 3'tür. Bu üç ürünü birlikte içeren satışlar `sale_id` 1 ve 4'tür. Bu nedenle seed verisine göre beklenen sonuç şöyledir:
+`week-05/seed.sql` verisinde aktif Bira ürünlerinin `product_id` değerleri 1, 2 ve 3'tür. Satış kalemleri incelendiğinde bu üç ürünü birlikte içeren fişler 1 ve 4'tür. Seed verisine göre sorgunun beklenen sonucu şöyledir:
 
-| sale_id | Beklenen açıklama |
-|---:|---|
-| 1 | Aktif Bira ürünleri 1, 2 ve 3'ün tamamı var. |
-| 4 | Aktif Bira ürünleri 1, 2 ve 3'ün tamamı var. |
+| sale_id | sold_at | Açıklama |
+|---:|---|---|
+| 1 | 2026-10-07 10:00 | Aktif Bira ürünleri 1, 2 ve 3'ün tamamı bulunur. |
+| 4 | 2026-10-09 09:00 | Aktif Bira ürünleri 1, 2 ve 3'ün tamamı bulunur. |
 
-**Çalıştırma doğrulaması hakkında:** Bu kayıt hazırlanırken sorgu yerel PostgreSQL sunucusunda çalıştırılmamıştır. Yukarıdaki 1 ve 4 sonucu, `seed.sql` kayıtları sorgu koşuluna göre incelenerek belirlenen beklenen sonuçtur; gerçek `psql` çıktısı olarak sunulmamaktadır. PostgreSQL'de doğrulama için `psql -d come381 -f week-05/algebra.sql` komutu çalıştırılmalı ve gerçek terminal sonucu bu kayda eklenmelidir.
+**Çalıştırma doğrulaması:** OneCompiler PostgreSQL editöründe D6 sorgusu tek başına çalıştırıldığında `ERROR: relation "sale" does not exist` hatası alınmıştır. Sonraki tablo kontrolünde `sale`, `sale_item`, `product` ve `category` tablolarının da mevcut olmadığı görülmüştür. Bu, sorgunun çalıştırıldığı oturumda şemanın oluşturulmadığını gösterir; sorgunun başarılı PostgreSQL çalıştırma sonucu değildir. Bu nedenle yukarıdaki 1 ve 4 numaralı fişler, `seed.sql` verisi sorgu koşullarına göre incelenerek belirlenen **beklenen sonuçtur**; gerçek PostgreSQL çıktısı olarak sunulmamaktadır. Başarılı doğrulama için şema, constraint'ler ve seed verisi aynı PostgreSQL veritabanında oluşturulduktan sonra D6 sorgusu yeniden çalıştırılmalıdır.
 
-**4. Yanıltıcı veriler ve hata analizi**
+### 4. Yanıltıcı veriler ve hata analizi
 
 Seed verisinde iki yanıltıcı örnek bulunmaktadır:
 
-- **Satış 2:** Üç farklı ürün içerir; ancak bunlardan biri atıştırmalıktır. Yalnızca fişteki farklı ürün sayısını aktif Bira ürünlerinin sayısıyla karşılaştıran ve kategori filtresi uygulamayan bir `COUNT` sorgusu bu fişi yanlışlıkla uygun kabul edebilir.
-- **Satış 5:** Üç Bira ürünü içeriyor gibi görünür; fakat ürün 9'un durumu `discontinued`'dır. Aktiflik koşulunu doğru ürün kümesine uygulamayan bir `COUNT` sorgusu bu fişi yanlışlıkla uygun kabul edebilir. Aktif Bira ürünlerinden ürün 3 bu fişte yoktur.
+- **Satış 2:** Üç farklı ürün (1, 2 ve 6) içerir; ancak ürün 6 atıştırmalık kategorisindedir. Kategori filtresi kullanmadan yalnızca fişteki farklı ürün sayısını aktif Bira ürünlerinin sayısıyla karşılaştıran basit bir `COUNT` yaklaşımı bu fişi yanlışlıkla uygun kabul edebilir.
+- **Satış 5:** Ürün 1, 2 ve 9'u içerir. Ürün 9 Bira kategorisindedir ancak durumu `discontinued` olduğu için hedef kümesine dahil değildir. Aktiflik koşulunu doğru uygulamayan bir `COUNT` yaklaşımı bu fişi yanlışlıkla uygun kabul edebilir. Aktif Bira ürünlerinden ürün 3 bu fişte bulunmaz.
 
-Çift `NOT EXISTS` çözümü, önce hedef kümesini açıkça `category_name = 'Bira'` ve `status = 'active'` koşullarıyla kurar; sonra bu hedef kümede satış fişinde bulunmayan herhangi bir ürün olup olmadığını sınar. Bu nedenle satış 2 ve 5 elenir; seed verisine göre doğru adaylar yalnızca 1 ve 4'tür.
+Çift `NOT EXISTS` çözümü hedef kümeyi açıkça `category_name = 'Bira'` ve `status = 'active'` koşullarıyla oluşturur; ardından hedef kümedeki eksik bir ürün bulunup bulunmadığını denetler. Bu nedenle satış 2 ve 5 elenir; seed verisine göre beklenen sonuç yalnızca satış 1 ve 4'tür.
 
 ## Kullanım ve sorumluluk notu
 
-Yapay zekâ çıktıları doğrudan ve kontrolsüz biçimde nihai çalışma kabul edilmemiştir. SQL ve tasarım kararları proje şeması, seed verisi ve ders yönergesiyle karşılaştırılmıştır. Gerçek PostgreSQL çalıştırma sonuçları yalnızca veritabanında çalıştırıldıktan sonra doğrulanmış sonuç olarak raporlanacaktır.
+Yapay zekâ çıktıları doğrudan ve kontrolsüz biçimde nihai çalışma kabul edilmemiştir. Öneriler proje şeması, örnek veri ve ders yönergesiyle karşılaştırılmıştır. Gerçek PostgreSQL çalıştırma sonuçları ancak ilgili SQL kodları PostgreSQL ortamında başarıyla çalıştırıldıktan sonra doğrulanmış sonuç olarak raporlanacaktır.
