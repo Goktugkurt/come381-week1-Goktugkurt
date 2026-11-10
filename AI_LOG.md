@@ -27,7 +27,77 @@ Birden fazla tabloyu ilgilendiren otomasyon kuralları (örneğin satış sıras
 
 ### 2. ChatGPT'nin ürettiği SQL yanıtı
 
-```sql
+
+-- COME 381 - D6 DIVISION TESTI
+-- OneCompiler PostgreSQL
+-- Tum tablolar ayni calistirmada olusturulur.
+
+DROP TABLE IF EXISTS sale_item, sale, product, category CASCADE;
+
+-- 1. CATEGORY
+CREATE TABLE category (
+    category_id INTEGER PRIMARY KEY,
+    category_name TEXT NOT NULL
+);
+
+-- 2. PRODUCT
+CREATE TABLE product (
+    product_id INTEGER PRIMARY KEY,
+    product_name TEXT,
+    category_id INTEGER REFERENCES category(category_id),
+    status TEXT
+);
+
+-- 3. SALE
+CREATE TABLE sale (
+    sale_id INTEGER PRIMARY KEY,
+    sold_at TIMESTAMP
+);
+
+-- 4. SALE_ITEM
+CREATE TABLE sale_item (
+    sale_item_id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    sale_id INTEGER REFERENCES sale(sale_id),
+    product_id INTEGER REFERENCES product(product_id)
+);
+
+-- KATEGORILER
+INSERT INTO category VALUES
+(1, 'Bira'),
+(2, 'Atistirmalik');
+
+-- URUNLER
+INSERT INTO product VALUES
+(1, 'Tuborg Gold', 1, 'active'),
+(2, 'Carlsberg', 1, 'active'),
+(3, 'Efes Malt', 1, 'active'),
+(6, 'Patates Cipsi', 2, 'active'),
+(9, 'Bomonti', 1, 'discontinued');
+
+-- SATISLAR
+INSERT INTO sale VALUES
+(1, '2026-10-07 10:00'),
+(2, '2026-10-08 11:00'),
+(3, '2026-10-08 15:00'),
+(4, '2026-10-09 09:00'),
+(5, '2026-10-09 10:00');
+
+-- SATIS KALEMLERI
+INSERT INTO sale_item (sale_id, product_id) VALUES
+(1, 1), (1, 2), (1, 3),
+(2, 1), (2, 2), (2, 6),
+(3, 2), (3, 6),
+(4, 1), (4, 2), (4, 3),
+(5, 1), (5, 2), (5, 9);
+
+-- TABLO KONTROLU
+SELECT
+    to_regclass('public.sale') AS sale,
+    to_regclass('public.sale_item') AS sale_item,
+    to_regclass('public.product') AS product,
+    to_regclass('public.category') AS category;
+
+-- D6: ILISKISEL BOLME (DIVISION)
 SELECT s.sale_id, s.sold_at
 FROM sale AS s
 WHERE NOT EXISTS (
@@ -45,7 +115,6 @@ WHERE NOT EXISTS (
       )
 )
 ORDER BY s.sale_id;
-```
 
 ### 3. Sorgunun açıklaması ve seed verisiyle beklenen sonuç
 
