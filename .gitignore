@@ -1,0 +1,6 @@
+# Gereksiz yerel dosyalar
+.DS_Store
+Thumbs.db
+*.tmp
+*.log
+# Ders kaniti icin *_output.txt dosyalarini ignore ETMEYIN.
